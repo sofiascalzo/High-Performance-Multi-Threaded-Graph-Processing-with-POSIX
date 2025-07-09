@@ -13,4 +13,7 @@
 
 
 - Comunicazione tra il thread e il main per l'interruzione
-  -  
+  - Il main crea una maschera completa dei segnali con `sigset_t all_signals; sigfillset(&all_signals); pthread_sigmask(SIG_BLOCK, &all_signals, NULL);` e inizializza un thread apposta per la gestione del segnale sigint, pertanto tutti i segnali sono bloccati e non gestiti eccetto sigint che verra` necessariamnte gestito dal thread gestore. Dopo aver stampato il pid del processo il gestore controlla i seguenti casi:
+     - `pipe==0`: segnala che il grafo e` ancoa in costuzione
+    - `pipe==1`: scrive -1 nella pipe in modo da segnalere la fine della scrittura e fare pthread_exit()
+    - `pipe==2`: 
