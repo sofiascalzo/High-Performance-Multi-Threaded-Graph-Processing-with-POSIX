@@ -34,7 +34,7 @@ attore **attori_leggi(char *f, int *n) {
         return NULL;
     }
 
-    int capacita = 10;
+    int capacita = 20000;
     attore **lista = malloc(capacita * sizeof(*lista));
     if (lista == NULL) {
         fprintf(stderr, "Errore malloc iniziale\n");
