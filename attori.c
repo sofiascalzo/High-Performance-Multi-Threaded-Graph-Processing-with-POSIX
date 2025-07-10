@@ -48,18 +48,17 @@ attore **attori_leggi(char *f, int *n) {
     size_t len = 0;
 
     while (getline(&buffer, &len, fp) != -1) {
-        char *saveptr;
         char *token;
 
-        token = strtok_r(buffer, "\t\n", &saveptr);
+        token = strtok(buffer, "\t\n");
         if (token == NULL) continue;
         int codice = strtol(token, NULL, 10);
 
-        token = strtok_r(NULL, "\t\n", &saveptr);
+        token = strtok(NULL, "\t\n");
         if (token == NULL) continue;
         char *nome = token;
 
-        token = strtok_r(NULL, "\t\n", &saveptr);
+        token = strtok(NULL, "\t\n");
         if (token == NULL) continue;
         int anno = strtol(token, NULL, 10);
 
