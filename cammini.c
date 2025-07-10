@@ -54,7 +54,7 @@ void *cbody(void *arg) {
         }
 
         char *line = a->buffer[*(a->cindex) % a->bufsize];
-        a->buffer[*(a->cindex) % a->bufsize] = NULL; // azzera subito il buffer
+        a->buffer[*(a->cindex) % a->bufsize] = NULL; 
         (*(a->cindex))++;
         (*(a->dati))--;
 
