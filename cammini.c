@@ -42,10 +42,6 @@ typedef struct {
 } dati_produttore;
 
 
-typedef struct{
-    int *pipe;     // 0: costruzione, 1: lettura piipe
-} signal_args;
-
 // CONSUMATORE
 void *cbody(void *arg) {
     dati_consumatori *a = (dati_consumatori *)arg;
@@ -58,44 +54,72 @@ void *cbody(void *arg) {
         }
 
         char *line = a->buffer[*(a->cindex) % a->bufsize];
-
-        if (line == NULL) {
-            pthread_mutex_unlock(a->mutex);
-            break;
-        }
-
+        a->buffer[*(a->cindex) % a->bufsize] = NULL; // azzera subito il buffer
         (*(a->cindex))++;
         (*(a->dati))--;
 
         pthread_cond_signal(a->full);
         pthread_mutex_unlock(a->mutex);
 
-        // PARSA LINEA: codice, numcop, cop...
-        int codice, numcop, nread;
-        char *ptr = line;
-        if (sscanf(ptr, "%d\t%d%n", &codice, &numcop, &nread) < 2) continue;
-        ptr += nread;
-
-        while (*ptr != '\t' && *ptr != '\0') ptr++; // skip to cop list
-        if (*ptr == '\t') ptr++;
-
-        int *cop = malloc(sizeof(int) * numcop);
-        for (int i = 0; i < numcop; i++) {
-            sscanf(ptr, "%d", &cop[i]);
-            while (*ptr != '\t' && *ptr != '\n' && *ptr != '\0') ptr++;
-            if (*ptr == '\t') ptr++;
+        if (line == NULL) {
+            break;
         }
 
-        attore **b=bsearch(&codice, a->attori, a->num_attori, sizeof(*a->attori), &bcomparator);
-        if(b==NULL) perror("Attore non trovato");
-        (*b)->numcop = numcop;
-        (*b)->cop = cop;
+        char *saveptr;
+        char *token = strtok_r(line, "\t\n", &saveptr);
+        if (!token) {
+            free(line);
+            continue;
+        }
+
+        int codice = atoi(token);
+
+        token = strtok_r(NULL, "\t\n", &saveptr);
+        if (!token) {
+            free(line);
+            continue;
+        }
+
+        int numcop = atoi(token);
+        if (numcop <= 0) {
+            free(line);
+            continue;
+        }
+
+        int *cop = malloc(sizeof(int) * numcop);
+        if (cop == NULL) {
+            perror("malloc cop");
+            free(line);
+            continue;
+        }
+
+        int i = 0;
+        while ((token = strtok_r(NULL, "\t\n", &saveptr)) != NULL && i < numcop) {
+            cop[i++] = atoi(token);
+        }
+
+        if (i != numcop) {
+            fprintf(stderr, "Numero di collegamenti dichiarati (%d) diverso da quelli letti (%d)\n", numcop, i);
+            free(cop);
+            free(line);
+            continue;
+        }
+
+        attore **b = bsearch(&codice, a->attori, a->num_attori, sizeof(*a->attori), &bcomparator);
+        if (b == NULL) {
+            fprintf(stderr, "Attore con codice %d non trovato\n", codice);
+            free(cop);
+        } else {
+            (*b)->numcop = numcop;
+            (*b)->cop = cop;
+        }
 
         free(line);
     }
 
     pthread_exit(NULL);
 }
+
 
 // PRODUTTORE: nel main
 void produttore(dati_produttore *a) {
@@ -116,7 +140,7 @@ void produttore(dati_produttore *a) {
         pthread_cond_signal(a->empty);
         pthread_mutex_unlock(a->mutex);
 
-        line = NULL; // importante per fare getline() su nuova allocazione
+        line = NULL; 
         len = 0;
     }
     free(line);
@@ -140,12 +164,8 @@ void produttore(dati_produttore *a) {
 
 
 void *tgestore(void *arg){
-    //deve liberare lui le risorse o il main?
     
-    signal_args *s_arg=(signal_args *)arg;
-
-    int *pipe=s_arg->pipe;
-    free(s_arg);
+    int *pipe = (int *) arg;
 
     sigset_t set;
     sigemptyset(&set);
@@ -173,7 +193,7 @@ void *tgestore(void *arg){
             fprintf(stderr, "Fine gestione dei segnali con -1\n"); //esce con sigint
             break;
         } else {
-            fprintf(stderr, "Fine gestione dei segnali con kill\n"); //nuovo stato, pipe=2 perche quando si chiude la pipe la write essendo bloccante non chiamava la pthred exit
+            fprintf(stderr, "Fine gestione dei segnali con kill\n"); 
             break;
         }
     }
@@ -194,6 +214,7 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "Errore nella lettura del file attori\n");
         exit(1);
     }
+    
 
     sigset_t all_signals;
     sigfillset(&all_signals);
@@ -201,17 +222,14 @@ int main(int argc, char *argv[]) {
 
     int pipe = 0;
 
-    signal_args *s_arg = malloc(sizeof(signal_args));
-    s_arg->pipe = &pipe;
-
     pthread_t signal_thread;
-    pthread_create(&signal_thread, NULL, tgestore, s_arg);
+    pthread_create(&signal_thread, NULL, tgestore, (void *)&pipe);
     pthread_detach(signal_thread);
 
     int tc = atoi(argv[3]);
     assert(tc > 0);
 
-    int bufsize = 10;
+    int bufsize = 32;
     char **buffer = malloc(sizeof(char *) * bufsize);
     int pindex = 0, cindex = 0, dati = 0;
 
@@ -280,7 +298,7 @@ int main(int argc, char *argv[]) {
     }
 
 
-    pipe=1;
+    pipe=1; //0 costruzione, 1 lettura
 
     int ab[2];
     while(1){
@@ -306,13 +324,13 @@ int main(int argc, char *argv[]) {
         
         pthread_t t;
         pthread_create(&t, NULL, &bfs, arg);
-        pthread_detach(t); // obbligatorio perche non so quanti thread verrano creati e comunque sono tutte indipendenti
+        pthread_detach(t); 
 
     }
 
     close(fd);
     pipe=2;
-    if(kill(getpid(), SIGINT) != 0) //perche se si chiude la pipe in scrittura il tgestore non pthread_exit, quindi invio sigint in modo che tgestore scriva -1 nell pipe e esca
+    if(kill(getpid(), SIGINT) != 0) //perche se si chiude la pipe in scrittura il tgestore non chiama pthread_exit, quindi invio sigint in modo che tgestore scriva -1 nell pipe e esca
     
     sleep(20);
     unlink("cammini.pipe");
@@ -327,5 +345,3 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-
-//gcc -o cammini cammini.c attori.c
