@@ -305,7 +305,7 @@ int main(int argc, char *argv[]) {
         ab[0]=0;ab[1]=0;
         ssize_t letti = read(fd, &ab[0], sizeof(int));
         letti = read(fd, &ab[1], sizeof(int));
-        printf("%d -> %d\n", ab[0], ab[1]);
+        
 
         if (letti==0 || ab[0]==-1 || ab[1]==-1){ 
             break;
