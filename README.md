@@ -15,7 +15,6 @@ Actor Collaboration Graph and Shortest Path Search
 **Overview:**
 This project constructs and analyzes an undirected graph of actors and their collaborations, using IMDb datasets. The implementation is divided into multiple components written in different programming languages, each responsible for a distinct stage of the workflow.
 
----
 
 ### **1. Java – Graph Construction (`CreaGrafo.java`)**
 
@@ -38,7 +37,6 @@ This project constructs and analyzes an undirected graph of actors and their col
   * All lookups and updates in constant or logarithmic time (no linear scans).
   * Execution under 5 minutes on reference machine.
 
----
 
 ### **2. C – Shortest Path Search (`cammini.c`)**
 
@@ -70,8 +68,7 @@ This project constructs and analyzes an undirected graph of actors and their col
   * All allocations performed with `malloc`/`realloc`.
   * No global variables.
   * Verified with **Valgrind** to have **no memory leaks or invalid accesses**.
-
----    
+  
 
 ## **Techniques and Implementation Details:**
 
@@ -86,7 +83,7 @@ This project constructs and analyzes an undirected graph of actors and their col
 
 The final deliverable is a modular, multi-language system capable of efficiently handling IMDb-scale datasets, supporting both structural graph analysis and detailed collaboration queries.
 
----
+
 ## **How to Run**
 1. Compilation
 
