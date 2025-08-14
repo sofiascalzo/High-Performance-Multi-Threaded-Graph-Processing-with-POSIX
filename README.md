@@ -3,12 +3,6 @@
 **Overview:**
 This project builds and analyzes an undirected graph of actors and their collaborations, based on IMDb datasets. The workflow is divided into two main components implemented in different programming languages for educational purposes:
 
----
-
-Ecco una versione più dettagliata e completa per il README, formale e concisa:
-
----
-
 **Title:**
 Actor Collaboration Graph and Shortest Path Search
 
