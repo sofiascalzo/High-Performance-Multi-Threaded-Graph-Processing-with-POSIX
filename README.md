@@ -5,53 +5,67 @@ This project builds and analyzes an undirected graph of actors and their collabo
 
 ---
 
+Ecco una versione più dettagliata e completa per il README, formale e concisa:
+
+---
+
+**Title:**
+Actor Collaboration Graph and Shortest Path Search
+
+**Overview:**
+This project constructs and analyzes an undirected graph of actors and their collaborations, using IMDb datasets. The implementation is divided into multiple components written in different programming languages, each responsible for a distinct stage of the workflow.
+
+---
+
 ### **1. Java – Graph Construction (`CreaGrafo.java`)**
 
-**Input:** `name.basics.tsv` and `title.principals.tsv`.
-**Filtering:**
+* **Input:** `name.basics.tsv` and `title.principals.tsv`.
+* **Filtering:**
 
   * Only actors/actresses with a known birth year are considered.
   * Excludes other professions (e.g., directors, producers).
-**Data Structures:**
+* **Data Structures:**
 
   * `Map<Integer, Attore>` associates each unique integer actor ID with its corresponding `Attore` instance.
   * Each `Attore` stores its code, name, birth year, and a `Set<Integer>` of co-star codes.
-**Output Files:**
+* **Output Files:**
 
   * `nomi.txt`: actor list in ascending ID order, containing code, name, and birth year.
   * `grafo.txt`: adjacency list for each actor (number of co-stars + sorted co-star codes).
-**Performance Constraints:**
+* **Performance Constraints:**
 
   * Single-pass reading of each input file.
   * All lookups and updates in constant or logarithmic time (no linear scans).
   * Execution under 5 minutes on reference machine.
 
+---
+
 ### **2. C – Shortest Path Search (`cammini.c`)**
 
-**Input:** `nomi.txt`, `grafo.txt`, and number of consumer threads.
-**Data Loading:**
+* **Input:** `nomi.txt`, `grafo.txt`, and number of consumer threads.
+* **Data Loading:**
 
   * Actors stored in a sorted array to enable O(log n) lookups via `bsearch`.
   * Graph loaded concurrently using a **producer-consumer model**:
 
     * Producer thread reads lines from `grafo.txt`.
     * Multiple consumer threads parse adjacency lists and populate `numcop` and `cop` arrays.
-**Shortest Path Algorithm:**
+* **Shortest Path Algorithm:**
 
   * Implemented as **Breadth-First Search (BFS)** using a dynamically allocated **FIFO queue** capable of holding an arbitrary number of elements.
   * Tracks visited nodes using a balanced **binary search tree (BST)** with `shuffle()` transformation to avoid degenerate cases.
   * Path reconstruction stores parent references and retrieves intermediate nodes in order.
-**Multithreading:**
+* **Multithreading:**
 
   * For each `(a, b)` pair read from a named pipe, a **detached thread** computes the shortest path.
   * Output written to file `a.b` and a summary printed to stdout, including path length or “no path” message and elapsed time in seconds (measured with `times()`).
-**Signal Handling:**
+* **Signal Handling:**
 
   * Dedicated signal handler thread prints the process PID and reacts to `SIGINT`:
 
     * During graph loading: prints status message and continues.
     * During pipe reading: waits 20 seconds, frees all resources, and terminates.
-**Memory Management:**
+* **Memory Management:**
 
   * All allocations performed with `malloc`/`realloc`.
   * No global variables.
