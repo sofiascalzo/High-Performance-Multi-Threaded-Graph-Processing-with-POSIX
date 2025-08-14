@@ -78,49 +78,55 @@ This project constructs and analyzes an undirected graph of actors and their col
 The final deliverable is a modular, multi-language system capable of efficiently handling IMDb-scale datasets, supporting both structural graph analysis and detailed collaboration queries.
 
 
+Ecco la sezione **How to Run** riscritta con la notazione puntata e numerazione in grassetto come mi hai chiesto:
+
+
 ## **How to Run**
- * **Compilation**
 
-  * From the project root directory:
+1. **Compilation**
 
-  * ```make```
+   * From the project root directory:
 
+     ```bash
+     make
+     ```
+   * This will:
 
-  * This will: Compile CreaGrafo.java into Java bytecode - Compile cammini.c into the cammini.out executable with -O3 optimization.
+     * Compile `CreaGrafo.java` into Java bytecode.
+     * Compile `cammini.c` into the `cammini.out` executable with `-O3` optimization.
 
-* **Graph Construction**
+2. **Graph Construction**
 
-  * Run CreaGrafo.java to generate nomi.txt and grafo.txt:
+   * Run `CreaGrafo.java` to generate `nomi.txt` and `grafo.txt`:
 
-  * ```java CreaGrafo name.basics.tsv title.principals.tsv```
+     ```bash
+     java CreaGrafo name.basics.tsv title.principals.tsv
+     ```
+   * For the complete project, this will also generate `partecipazioni.txt`.
 
+3. **Shortest Path Search**
 
-  * For the complete project, this will also generate partecipazioni.txt.
+   * Start `cammini.out`, specifying number of consumer threads:
 
-**Shortest Path Search**
+     ```bash
+     ./cammini.out nomi.txt grafo.txt 4
+     ```
+   * The program will wait for `(a, b)` pairs sent via a named pipe `cammini.pipe`.
 
-  Start cammini.out, specifying number of consumer threads:
+4. **Sending Actor Pairs to Pipe**
 
-  ```./cammini.out nomi.txt grafo.txt 4```
+   * In another terminal:
 
+     ```bash
+     ./cammini.py 148 8570840
+     ```
+   * This will write to the pipe, trigger BFS computation, and produce files named `148.8570840` with the path result.
 
-  The program will wait for (a, b) pairs sent via a named pipe cammini.pipe.
+5. **Project Verification**
 
-**Sending Actor Pairs to Pipe**
+   * Run the provided test script to ensure compliance:
 
-  In another terminal:
-
-  ```./cammini.py 148 8570840```
-
-
-  This will write to the pipe, trigger BFS computation, and produce files named 148.8570840 with the path result.
-
-
-**Project Verification**
-
-  Run the provided test script to ensure compliance:
-
-  ```python3 controllaProgetto.py```
-
-
-  Add -r option for reduced project testing.
+     ```bash
+     python3 controllaProgetto.py
+     ```
+   * Add `-r` option for reduced project testing.
