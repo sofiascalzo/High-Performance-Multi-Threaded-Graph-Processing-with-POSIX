@@ -79,7 +79,7 @@ The final deliverable is a modular, multi-language system capable of efficiently
 
 
 ## **How to Run**
-1. Compilation
+ **Compilation**
 
   From the project root directory:
 
@@ -92,7 +92,7 @@ The final deliverable is a modular, multi-language system capable of efficiently
 
   Compile cammini.c into the cammini.out executable with -O3 optimization.
 
-2. Graph Construction
+**Graph Construction**
 
   Run CreaGrafo.java to generate nomi.txt and grafo.txt:
 
@@ -101,7 +101,7 @@ The final deliverable is a modular, multi-language system capable of efficiently
 
   For the complete project, this will also generate partecipazioni.txt.
 
-3. Shortest Path Search
+**Shortest Path Search**
 
   Start cammini.out, specifying number of consumer threads:
 
@@ -110,7 +110,7 @@ The final deliverable is a modular, multi-language system capable of efficiently
 
   The program will wait for (a, b) pairs sent via a named pipe cammini.pipe.
 
-4. Sending Actor Pairs to Pipe
+**Sending Actor Pairs to Pipe**
 
   In another terminal:
 
@@ -120,7 +120,7 @@ The final deliverable is a modular, multi-language system capable of efficiently
   This will write to the pipe, trigger BFS computation, and produce files named 148.8570840 with the path result.
 
 
-6. Project Verification
+**Project Verification**
 
   Run the provided test script to ensure compliance:
 
