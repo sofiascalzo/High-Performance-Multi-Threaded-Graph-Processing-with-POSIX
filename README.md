@@ -79,27 +79,23 @@ The final deliverable is a modular, multi-language system capable of efficiently
 
 
 ## **How to Run**
- **Compilation**
+ * **Compilation**
 
-  From the project root directory:
+  * From the project root directory:
 
-  ```make```
-
-
-  This will:
-
-  Compile CreaGrafo.java into Java bytecode.
-
-  Compile cammini.c into the cammini.out executable with -O3 optimization.
-
-**Graph Construction**
-
-  Run CreaGrafo.java to generate nomi.txt and grafo.txt:
-
-  ```java CreaGrafo name.basics.tsv title.principals.tsv```
+  * ```make```
 
 
-  For the complete project, this will also generate partecipazioni.txt.
+  * This will: Compile CreaGrafo.java into Java bytecode - Compile cammini.c into the cammini.out executable with -O3 optimization.
+
+* **Graph Construction**
+
+  * Run CreaGrafo.java to generate nomi.txt and grafo.txt:
+
+  * ```java CreaGrafo name.basics.tsv title.principals.tsv```
+
+
+  * For the complete project, this will also generate partecipazioni.txt.
 
 **Shortest Path Search**
 
